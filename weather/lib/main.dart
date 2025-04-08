@@ -22,6 +22,12 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
         textTheme: GoogleFonts.poppinsTextTheme(),
+        cardTheme: CardTheme(
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
       ),
       home: const MyHomePage(title: 'Weather'),
     );
@@ -124,83 +130,139 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          widget.title,
-          style: const TextStyle(color: Colors.black87),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black87),
-            onPressed: _getWeather,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.lightBlue[200]!,
+              Colors.lightBlue[50]!,
+            ],
           ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _getWeather,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (_weatherData != null) ...[
-                        Text(
-                          _weatherData!['name'],
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
+        ),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: _getWeather,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                widget.title,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.refresh,
+                                    color: Colors.black87),
+                                onPressed: _getWeather,
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          _getWeatherIcon(_weatherData!['weather'][0]['description']),
-                          style: const TextStyle(fontSize: 72),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          '${_weatherData!['main']['temp'].round()}°C',
-                          style: const TextStyle(
-                            fontSize: 64,
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                        Text(
-                          _weatherData!['weather'][0]['description']
-                              .toString()
-                              .toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            color: Colors.black54,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        _buildWeatherDetailsCard(),
-                      ] else
-                        Text(_weatherInfo),
-                    ],
+                          if (_weatherData != null) ...[
+                            const SizedBox(height: 20),
+                            Text(
+                              _weatherData!['name'],
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                _getWeatherIcon(
+                                    _weatherData!['weather'][0]['description']),
+                                style: const TextStyle(fontSize: 72),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              '${_weatherData!['main']['temp'].round()}°C',
+                              style: const TextStyle(
+                                fontSize: 64,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                            Text(
+                              'Feels like ${_weatherData!['main']['feels_like'].round()}°C',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '↓${_weatherData!['main']['temp_min'].round()}°C',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(width: 20),
+                                Text(
+                                  '↑${_weatherData!['main']['temp_max'].round()}°C',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              _weatherData!['weather'][0]['description']
+                                  .toString()
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                color: Colors.black54,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            _buildWeatherDetailsCard(),
+                          ] else
+                            Text(_weatherInfo),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
   Widget _buildWeatherDetailsCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             _buildWeatherDetail(
@@ -208,13 +270,13 @@ class _MyHomePageState extends State<MyHomePage> {
               '${_weatherData!['main']['humidity']}%',
               Icons.water_drop,
             ),
-            const Divider(),
+            const Divider(height: 30),
             _buildWeatherDetail(
               'Wind Speed',
               '${_weatherData!['wind']['speed']} m/s',
               Icons.air,
             ),
-            const Divider(),
+            const Divider(height: 30),
             _buildWeatherDetail(
               'Pressure',
               '${_weatherData!['main']['pressure']} hPa',
